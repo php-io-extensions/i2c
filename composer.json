@@ -1,0 +1,30 @@
+{
+    "name": "php-io-extensions/i2c",
+    "type": "php-ext",
+    "description": "PHP-Controllable I2C Extension",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Project Saturn Studios, LLC",
+            "email": "info@projectsaturnstudios.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.3"
+    },
+    "php-ext": {
+        "extension-name": "i2c",
+        "priority": 30,
+        "build-path": "ext",
+        "support-zts": true,
+        "support-nts": true,
+        "os-families-exclude": ["windows", "mac-os"],
+        "configure-options": [
+            {
+                "name": "enable-i2c",
+                "description": "Enable the I2C extension",
+                "needs-value": false
+            }
+        ]
+    }
+}
