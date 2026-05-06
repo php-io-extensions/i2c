@@ -1,6 +1,7 @@
 {
     "name": "php-io-extensions/i2c",
     "type": "php-ext",
+    "version": "0.1.1",
     "description": "PHP-Controllable I2C Extension",
     "license": "MIT",
     "authors": [
@@ -18,7 +19,7 @@
         "build-path": "ext",
         "support-zts": true,
         "support-nts": true,
-        "os-families-exclude": ["windows", "mac-os"],
+        "os-families-exclude": ["windows", "darwin"],
         "configure-options": [
             {
                 "name": "enable-i2c",
