@@ -3,7 +3,7 @@
     "name": "i2c",
     "description": "PHP-Controllable I2C Extension",
     "author": "Project Saturn Studios, LLC",
-    "version": "0.1.0",
+    "version": "0.1.2",
     "warnings": {
         "unused-variable": true,
         "unused-variable-external": true,

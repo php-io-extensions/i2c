@@ -1,7 +1,6 @@
 {
     "name": "php-io-extensions/i2c",
     "type": "php-ext",
-    "version": "0.1.1",
     "description": "PHP-Controllable I2C Extension",
     "license": "MIT",
     "authors": [
