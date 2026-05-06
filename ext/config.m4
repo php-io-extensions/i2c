@@ -2,7 +2,11 @@ PHP_ARG_ENABLE(i2c, whether to enable i2c, [ --enable-i2c   Enable I2c])
 
 if test "$PHP_I2C" = "yes"; then
 
-	
+	dnl GCC 14 promoted several long-standing warnings to hard errors by default.
+	dnl Zephir-generated C code trips these in dead-code paths that are
+	dnl runtime-safe and have built cleanly on gcc <= 13 and clang for years.
+	dnl Each flag is silently ignored by compilers that don't know it.
+	CFLAGS="$CFLAGS -Wno-error=incompatible-pointer-types -Wno-error=int-conversion -Wno-error=implicit-function-declaration -Wno-error=implicit-int"
 
 	if ! test "x" = "x"; then
 		PHP_EVAL_LIBLINE(, I2C_SHARED_LIBADD)
@@ -57,6 +61,6 @@ if test "$PHP_I2C" = "yes"; then
 
 	CPPFLAGS=$old_CPPFLAGS
 
-	PHP_INSTALL_HEADERS([ext/i2c], [php_I2C.h])
+	PHP_INSTALL_HEADERS([ext/i2c], [php_i2c.h])
 
 fi
