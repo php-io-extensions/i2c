@@ -1,13 +1,5 @@
 namespace I2c;
 
-%{
-#include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
-#include <linux/i2c-dev.h>
-#include <linux/i2c.h>
-#include <sys/ioctl.h>
-}%
 class I2CConfig
 {
     /**
@@ -20,9 +12,7 @@ class I2CConfig
     {
         int results;
 
-        %{
-            results = ioctl(fd, I2C_TENBIT, enable);
-        }%
+        let results = i2c_tenbit(fd, enable);
 
         return results;
     }
@@ -37,9 +27,7 @@ class I2CConfig
     {
         int results;
 
-        %{
-            results = ioctl(fd, I2C_PEC, enable);
-        }%
+        let results = i2c_pec(fd, enable);
 
         return results;
     }
@@ -52,22 +40,10 @@ class I2CConfig
     public static function funcs(int fd) -> int
     {
         int results;
-        int funcs = 0;
 
-        %{
-            unsigned long functionality;
-            results = ioctl(fd, I2C_FUNCS, &functionality);
+        let results = i2c_funcs(fd);
 
-            if (results >= 0) {
-                funcs = (int)functionality;
-            }
-        }%
-
-        if (results < 0) {
-            return -1;
-        }
-
-        return funcs;
+        return results;
     }
 
     /**
@@ -78,62 +54,9 @@ class I2CConfig
      */
     public static function rdwr(int fd, array messages) -> int
     {
-        int results = 0;
-        int nmsgs;
+        int results;
 
-        let nmsgs = count(messages);
-
-        %{
-            struct i2c_msg msgs[nmsgs];
-            struct i2c_rdwr_ioctl_data msgset;
-            int i;
-            int _results = 0;
-
-            memset(msgs, 0, sizeof(msgs));
-
-            // Build message array
-            for (i = 0; i < nmsgs; i++) {
-                zval *message = zend_hash_index_find(Z_ARRVAL_P(&messages), i);
-                if (message == NULL) {
-                    _results = -1;
-                    break;
-                }
-
-                // Get address
-                zval *addr_val = zend_hash_str_find(Z_ARRVAL_P(message), "addr", sizeof("addr")-1);
-                if (addr_val == NULL) {
-                    _results = -1;
-                    break;
-                }
-                msgs[i].addr = (__u16)zval_get_long(addr_val);
-
-                // Get flags
-                zval *flags_val = zend_hash_str_find(Z_ARRVAL_P(message), "flags", sizeof("flags")-1);
-                if (flags_val == NULL) {
-                    _results = -1;
-                    break;
-                }
-                msgs[i].flags = (__u16)zval_get_long(flags_val);
-
-                // Get data
-                zval *data_val = zend_hash_str_find(Z_ARRVAL_P(message), "data", sizeof("data")-1);
-                if (data_val == NULL) {
-                    _results = -1;
-                    break;
-                }
-                msgs[i].len = (__u16)Z_STRLEN_P(data_val);
-                msgs[i].buf = (__u8 *)Z_STRVAL_P(data_val);
-            }
-
-            if (_results != -1) {
-                msgset.msgs = msgs;
-                msgset.nmsgs = nmsgs;
-
-                _results = ioctl(fd, I2C_RDWR, &msgset);
-            }
-
-            results = (zend_long) _results;
-        }%
+        let results = i2c_rdwr(fd, messages);
 
         return results;
     }

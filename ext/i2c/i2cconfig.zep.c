@@ -12,17 +12,10 @@
 #include <Zend/zend_interfaces.h>
 
 #include "kernel/main.h"
+#include "api/i2c-config.h"
 #include "kernel/operators.h"
 #include "kernel/memory.h"
 #include "kernel/object.h"
-
-#include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
-#include <linux/i2c-dev.h>
-#include <linux/i2c.h>
-#include <sys/ioctl.h>
-
 
 
 ZEPHIR_INIT_CLASS(I2c_I2CConfig)
@@ -40,17 +33,19 @@ ZEPHIR_INIT_CLASS(I2c_I2CConfig)
  */
 PHP_METHOD(I2c_I2CConfig, tenbit)
 {
-	zval *fd_param = NULL, *enable_param = NULL;
+	zval *fd_param = NULL, *enable_param = NULL, _0, _1;
 	zend_long fd, enable, results = 0;
 
+	ZVAL_UNDEF(&_0);
+	ZVAL_UNDEF(&_1);
 	ZEND_PARSE_PARAMETERS_START(2, 2)
 		Z_PARAM_LONG(fd)
 		Z_PARAM_LONG(enable)
 	ZEND_PARSE_PARAMETERS_END();
 	zephir_fetch_params_without_memory_grow(2, 0, &fd_param, &enable_param);
-	
-            results = ioctl(fd, I2C_TENBIT, enable);
-        
+	ZVAL_LONG(&_0, fd);
+	ZVAL_LONG(&_1, enable);
+	results = i2c_tenbit(&_0, &_1);
 	RETURN_LONG(results);
 }
 
@@ -62,17 +57,19 @@ PHP_METHOD(I2c_I2CConfig, tenbit)
  */
 PHP_METHOD(I2c_I2CConfig, pec)
 {
-	zval *fd_param = NULL, *enable_param = NULL;
+	zval *fd_param = NULL, *enable_param = NULL, _0, _1;
 	zend_long fd, enable, results = 0;
 
+	ZVAL_UNDEF(&_0);
+	ZVAL_UNDEF(&_1);
 	ZEND_PARSE_PARAMETERS_START(2, 2)
 		Z_PARAM_LONG(fd)
 		Z_PARAM_LONG(enable)
 	ZEND_PARSE_PARAMETERS_END();
 	zephir_fetch_params_without_memory_grow(2, 0, &fd_param, &enable_param);
-	
-            results = ioctl(fd, I2C_PEC, enable);
-        
+	ZVAL_LONG(&_0, fd);
+	ZVAL_LONG(&_1, enable);
+	results = i2c_pec(&_0, &_1);
 	RETURN_LONG(results);
 }
 
@@ -83,26 +80,17 @@ PHP_METHOD(I2c_I2CConfig, pec)
  */
 PHP_METHOD(I2c_I2CConfig, funcs)
 {
-	zval *fd_param = NULL;
-	zend_long fd, results = 0, funcs;
+	zval *fd_param = NULL, _0;
+	zend_long fd, results = 0;
 
+	ZVAL_UNDEF(&_0);
 	ZEND_PARSE_PARAMETERS_START(1, 1)
 		Z_PARAM_LONG(fd)
 	ZEND_PARSE_PARAMETERS_END();
 	zephir_fetch_params_without_memory_grow(1, 0, &fd_param);
-	funcs = 0;
-	
-            unsigned long functionality;
-            results = ioctl(fd, I2C_FUNCS, &functionality);
-
-            if (results >= 0) {
-                funcs = (int)functionality;
-            }
-        
-	if (results < 0) {
-		RETURN_LONG(-1);
-	}
-	RETURN_LONG(funcs);
+	ZVAL_LONG(&_0, fd);
+	results = i2c_funcs(&_0);
+	RETURN_LONG(results);
 }
 
 /**
@@ -115,9 +103,10 @@ PHP_METHOD(I2c_I2CConfig, rdwr)
 {
 	zephir_method_globals *ZEPHIR_METHOD_GLOBALS_PTR = NULL;
 	zval messages;
-	zval *fd_param = NULL, *messages_param = NULL;
-	zend_long fd, results, nmsgs = 0;
+	zval *fd_param = NULL, *messages_param = NULL, _0;
+	zend_long fd, results = 0;
 
+	ZVAL_UNDEF(&_0);
 	ZVAL_UNDEF(&messages);
 	ZEND_PARSE_PARAMETERS_START(2, 2)
 		Z_PARAM_LONG(fd)
@@ -127,59 +116,8 @@ PHP_METHOD(I2c_I2CConfig, rdwr)
 	zephir_memory_grow_stack(ZEPHIR_METHOD_GLOBALS_PTR, __func__);
 	zephir_fetch_params(1, 2, 0, &fd_param, &messages_param);
 	zephir_get_arrval(&messages, messages_param);
-	results = 0;
-	nmsgs = zephir_fast_count_int(&messages);
-	
-            struct i2c_msg msgs[nmsgs];
-            struct i2c_rdwr_ioctl_data msgset;
-            int i;
-            int _results = 0;
-
-            memset(msgs, 0, sizeof(msgs));
-
-            // Build message array
-            for (i = 0; i < nmsgs; i++) {
-                zval *message = zend_hash_index_find(Z_ARRVAL_P(&messages), i);
-                if (message == NULL) {
-                    _results = -1;
-                    break;
-                }
-
-                // Get address
-                zval *addr_val = zend_hash_str_find(Z_ARRVAL_P(message), "addr", sizeof("addr")-1);
-                if (addr_val == NULL) {
-                    _results = -1;
-                    break;
-                }
-                msgs[i].addr = (__u16)zval_get_long(addr_val);
-
-                // Get flags
-                zval *flags_val = zend_hash_str_find(Z_ARRVAL_P(message), "flags", sizeof("flags")-1);
-                if (flags_val == NULL) {
-                    _results = -1;
-                    break;
-                }
-                msgs[i].flags = (__u16)zval_get_long(flags_val);
-
-                // Get data
-                zval *data_val = zend_hash_str_find(Z_ARRVAL_P(message), "data", sizeof("data")-1);
-                if (data_val == NULL) {
-                    _results = -1;
-                    break;
-                }
-                msgs[i].len = (__u16)Z_STRLEN_P(data_val);
-                msgs[i].buf = (__u8 *)Z_STRVAL_P(data_val);
-            }
-
-            if (_results != -1) {
-                msgset.msgs = msgs;
-                msgset.nmsgs = nmsgs;
-
-                _results = ioctl(fd, I2C_RDWR, &msgset);
-            }
-
-            results = (zend_long) _results;
-        
+	ZVAL_LONG(&_0, fd);
+	results = i2c_rdwr(&_0, &messages);
 	RETURN_MM_LONG(results);
 }
 

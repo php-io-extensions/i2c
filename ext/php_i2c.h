@@ -11,7 +11,7 @@
 #include "kernel/globals.h"
 
 #define PHP_I2C_NAME        "i2c"
-#define PHP_I2C_VERSION     "0.1.1"
+#define PHP_I2C_VERSION     "0.1.4"
 #define PHP_I2C_EXTNAME     "i2c"
 #define PHP_I2C_AUTHOR      "Project Saturn Studios, LLC"
 #define PHP_I2C_ZEPVERSION  "0.19.0-$Id$"

@@ -2,11 +2,7 @@ PHP_ARG_ENABLE(i2c, whether to enable i2c, [ --enable-i2c   Enable I2c])
 
 if test "$PHP_I2C" = "yes"; then
 
-	dnl GCC 14 promoted several long-standing warnings to hard errors by default.
-	dnl Zephir-generated C code trips these in dead-code paths that are
-	dnl runtime-safe and have built cleanly on gcc <= 13 and clang for years.
-	dnl Each flag is silently ignored by compilers that don't know it.
-	CFLAGS="$CFLAGS -Wno-error=incompatible-pointer-types -Wno-error=int-conversion -Wno-error=implicit-function-declaration -Wno-error=implicit-int"
+	
 
 	if ! test "x" = "x"; then
 		PHP_EVAL_LIBLINE(, I2C_SHARED_LIBADD)
@@ -14,7 +10,8 @@ if test "$PHP_I2C" = "yes"; then
 
 	AC_DEFINE(HAVE_I2C, 1, [Whether you have I2c])
 	i2c_sources="i2c.c kernel/main.c kernel/memory.c kernel/exception.c kernel/debug.c kernel/backtrace.c kernel/object.c kernel/array.c kernel/string.c kernel/fcall.c kernel/require.c kernel/file.c kernel/operators.c kernel/math.c kernel/concat.c kernel/variables.c kernel/filter.c kernel/iterator.c kernel/time.c kernel/exit.c i2c/i2cconfig.zep.c
-	i2c/i2cuse.zep.c "
+	i2c/i2cuse.zep.c api/i2c-config.c
+	api/i2c-use.c"
 	PHP_NEW_EXTENSION(i2c, $i2c_sources, $ext_shared,, )
 	PHP_ADD_BUILD_DIR([$ext_builddir/kernel/])
 	for dir in "i2c"; do
@@ -61,6 +58,6 @@ if test "$PHP_I2C" = "yes"; then
 
 	CPPFLAGS=$old_CPPFLAGS
 
-	PHP_INSTALL_HEADERS([ext/i2c], [php_i2c.h])
+	PHP_INSTALL_HEADERS([ext/i2c], [php_I2C.h])
 
 fi

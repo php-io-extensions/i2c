@@ -22,7 +22,7 @@
         "configure-options": [
             {
                 "name": "enable-i2c",
-                "description": "Enable the I2C extension",
+                "description": "Enable the Linux I2C extension",
                 "needs-value": false
             }
         ]
