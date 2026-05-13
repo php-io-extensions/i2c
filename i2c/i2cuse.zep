@@ -20,11 +20,12 @@ class I2CUse
         return result;
     }
 
-    public static function write(int fd, string data, int bytes_to_write) -> int
+    public static function write(int fd, var data, int bytes_to_write) -> int
     {
         int results;
+        string payload = data;
 
-        let results = i2c_write(fd, data, bytes_to_write);
+        let results = i2c_write(fd, payload, bytes_to_write);
 
         return results;
     }

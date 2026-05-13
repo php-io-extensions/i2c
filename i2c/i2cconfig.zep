@@ -52,7 +52,7 @@ class I2CConfig
      * @param array messages Array of message arrays, each containing: addr, flags, data
      * @return int Number of messages transferred on success, -1 on failure
      */
-    public static function rdwr(int fd, array messages) -> int
+    public static function rdwr(int fd, var messages) -> int
     {
         int results;
 

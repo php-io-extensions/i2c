@@ -12,7 +12,7 @@ if test "$PHP_I2C" = "yes"; then
 	i2c_sources="i2c.c kernel/main.c kernel/memory.c kernel/exception.c kernel/debug.c kernel/backtrace.c kernel/object.c kernel/array.c kernel/string.c kernel/fcall.c kernel/require.c kernel/file.c kernel/operators.c kernel/math.c kernel/concat.c kernel/variables.c kernel/filter.c kernel/iterator.c kernel/time.c kernel/exit.c i2c/i2cconfig.zep.c
 	i2c/i2cuse.zep.c api/i2c-config.c
 	api/i2c-use.c"
-	PHP_NEW_EXTENSION(i2c, $i2c_sources, $ext_shared,, )
+	PHP_NEW_EXTENSION(i2c, $i2c_sources, $ext_shared,, -Wno-incompatible-pointer-types -Wno-int-conversion -Wno-implicit-function-declaration -Wno-implicit-int)
 	PHP_ADD_BUILD_DIR([$ext_builddir/kernel/])
 	for dir in "i2c"; do
 		PHP_ADD_BUILD_DIR([$ext_builddir/$dir])
